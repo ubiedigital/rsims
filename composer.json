@@ -1,12 +1,12 @@
 {
-    "name": "akeneo/pim-community-standard",
-    "description": "The \"Akeneo Community Standard Edition\" distribution",
+    "name": "ubiedigital/rsims",
+    "description": "Akeneo Community Edition fork by UbieDigital",
     "license": "OSL-3.0",
     "type": "project",
     "authors": [
         {
-            "name": "Akeneo",
-            "homepage": "http://www.akeneo.com"
+            "name": "UbieDigital",
+            "homepage": "http://ubiedigital.com"
         }
     ],
     "autoload": {

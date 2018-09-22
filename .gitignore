@@ -2,6 +2,7 @@ web/bundles/*
 web/media/*
 web/css/*
 web/js/*
+web/.htaccess
 app/archive/*
 app/config/parameters.yml
 app/config/*_local.yml
