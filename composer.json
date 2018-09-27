@@ -30,10 +30,11 @@
     },
     "require-dev": {
         "doctrine/migrations": "1.5.0",
-        "doctrine/doctrine-migrations-bundle": "1.2.1"
+        "doctrine/doctrine-migrations-bundle": "1.2.1",
+        "phing/phing": "*"
     },
     "scripts": {
-        "post-install-cmd": [
+        "warmup-scripts": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
@@ -42,13 +43,14 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::removeSymfonyStandardFiles",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget",
             "php bin/console fos:js-routing:dump --target=web/js/routes.js",
-            "bin/console pim:installer:assets --symlink --clean"
+            "php bin/console pim:installer:assets --symlink --clean",
+            "yarn run webpack"
         ],
         "post-install-cmd": [
-            "@symfony-scripts"
+            "@warmup-scripts"
         ],
         "post-update-cmd": [
-            "@symfony-scripts",
+            "@warmup-scripts",
             "Pim\\Bundle\\InstallerBundle\\ComposerScripts::copyUpgradesFiles"
         ]
     },
