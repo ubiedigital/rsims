@@ -1,13 +1,22 @@
 parameters:
     database_driver:                      pdo_mysql
-    database_host:                        localhost
-    database_port:                        ~
-    database_name:                        akeneo_pim
-    database_user:                        akeneo_pim
-    database_password:                    akeneo_pim
-    locale:                               en
-    secret:                               ThisTokenIsNotSoSecretChangeIt
+    database_host:                        ##DATABASE_HOST##
+    database_port:                        ##DATABASE_PORT##
+    database_name:                        ##DATABASE_NAME##
+    database_user:                        ##DATABASE_USER##
+    database_password:                    ##DATABASE_PASSWORD##
+    locale:                               ##LOCALE##
+    secret:                               ##SECRET##
     product_index_name:                   akeneo_pim_product
     product_model_index_name:             akeneo_pim_product_model
     product_and_product_model_index_name: akeneo_pim_product_and_product_model
-    index_hosts:                          'localhost: 9200'
+    index_hosts:                          '##INDEX_HOSTS##'
+
+    mailer_transport:     ##MAILER_TRANSPORT##
+    mailer_host:          ##MAILER_HOST##
+    mailer_port:          ##MAILER_PORT##
+    mailer_encryption:    ##MAILER_ENCRYPTION##
+    mailer_user:          ##MAILER_USER##
+    mailer_password:      ##MAILER_PASSWORD##
+    mailer_from_address:  ##MAILER_FROM_ADDRESS##
+    mailer_from_name:     ##MAILER_FROM_NAME##

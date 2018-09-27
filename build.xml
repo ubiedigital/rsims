@@ -13,6 +13,7 @@
 
     <property name="environment" value="dev" override="true"/>
 
+    <property name="deploy.reference" value="null"/>
     <property name="deploy.releases_dir" value="releases"/>
     <property name="deploy.docroot_dir" value="current"/>
     <property name="deploy.shared_dir" value="shared"/>
@@ -130,7 +131,9 @@
         <copy todir="${build.release_path}">
             <fileset dir=".">
                 <include name="**"/>
-                <exclude name="config/parameters.yml"/>
+                <exclude name="app/config/parameters.yml"/>
+                <exclude name="app/uploads/**"/>
+                <exclude name="app/uploads"/>
                 <exclude name="var/attachment/*"/>
                 <exclude name="var/attachment"/>
                 <exclude name="var/cache/**"/>
@@ -144,8 +147,6 @@
                 <exclude name="web/images"/>
                 <exclude name="web/media/**"/>
                 <exclude name="web/media"/>
-                <exclude name="app/uploads/**"/>
-                <exclude name="app/uploads"/>
                 <exclude name="build/**"/>
                 <exclude name="vendor/**"/>
                 <exclude name=".idea/**"/>
@@ -170,7 +171,7 @@
             <equals arg1="${build.parameters.properties.exists}" arg2="true"/>
             <then>
                 <echo msg="Building parameters file..."/>
-                <property file="build.parameters.properties" override="true"/>
+                <property file="build.parameters.${environment}.properties" override="true"/>
                 <copy file="${build.release_path}/app/config/parameters.yml.dist"
                       tofile="${build.release_path}/app/config/parameters.yml" overwrite="true">
                     <filterchain>
@@ -180,16 +181,17 @@
                             <token key="DATABASE_NAME" value="${build.parameters.database_name}"/>
                             <token key="DATABASE_USER" value="${build.parameters.database_user}"/>
                             <token key="DATABASE_PASSWORD" value="${build.parameters.database_password}"/>
+                            <token key="LOCALE" value="${build.parameters.locale}"/>
+                            <token key="SECRET" value="${build.parameters.secret}"/>
+                            <token key="INDEX_HOSTS" value="${build.parameters.index_hosts}"/>
                             <token key="MAILER_TRANSPORT" value="${build.parameters.mailer_transport}"/>
                             <token key="MAILER_HOST" value="${build.parameters.mailer_host}"/>
                             <token key="MAILER_PORT" value="${build.parameters.mailer_port}"/>
                             <token key="MAILER_ENCRYPTION" value="${build.parameters.mailer_encryption}"/>
                             <token key="MAILER_USER" value="${build.parameters.mailer_user}"/>
                             <token key="MAILER_PASSWORD" value="${build.parameters.mailer_password}"/>
-                            <token key="WEB_BACKEND_PREFIX" value="${build.parameters.web_backend_prefix}"/>
-                            <token key="LOCALE" value="${build.parameters.locale}"/>
-                            <token key="SECRET" value="${build.parameters.secret}"/>
-                            <token key="INSTALLED" value="${build.parameters.installed}"/>
+                            <token key="MAILER_FROM_ADDRESS" value="${build.parameters.mailer_from_address}"/>
+                            <token key="MAILER_FROM_NAME" value="${build.parameters.mailer_from_name}"/>
                         </replacetokens>
                     </filterchain>
                 </copy>
@@ -210,7 +212,7 @@
                 <property name="build.htaccess_suffix" value=""/>
             </then>
         </if>
-        <copy file="${build.release_path}/public/.htaccess.dist" tofile="${build.release_path}/public/.htaccess"
+        <copy file="${build.release_path}/web/.htaccess.dist" tofile="${build.release_path}/web/.htaccess"
               overwrite="true">
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
@@ -253,12 +255,12 @@
     <target name="deploy:upload" hidden="true">
         <echo>Preparing directories</echo>
         <exec
-                command="ssh -p ${deploy.port} ${deploy.user}@${deploy.host} 'mkdir -p ${deploy.releases_path}/${build.release}'"
+                command="ssh -oStrictHostKeyChecking=no -p ${deploy.port} ${deploy.user}@${deploy.host} 'mkdir -p ${deploy.releases_path}/${build.release}'"
                 passthru="true"
         />
 
         <echo>Copying package</echo>
-        <exec command="scp -P${deploy.port} ${build.archive_path} ${deploy.user}@${deploy.host}:/tmp/${build.archive}" passthru="true" checkreturn="true"/>
+        <exec command="scp -oStrictHostKeyChecking=no -P${deploy.port} ${build.archive_path} ${deploy.user}@${deploy.host}:/tmp/${build.archive}" passthru="true" checkreturn="true"/>
         <echo>Extracting package</echo>
         <phingcall target="deploy:command">
             <property
@@ -302,12 +304,12 @@
             <property name="destination" value="${deploy.releases_dir}/${build.release}/var/import_export"/>
         </phingcall>
         <phingcall target="deploy:symlink">
-            <property name="source" value="../../../${deploy.shared_dir}/public/images"/>
-            <property name="destination" value="${deploy.releases_dir}/${build.release}/public/images"/>
+            <property name="source" value="../../../${deploy.shared_dir}/web/images"/>
+            <property name="destination" value="${deploy.releases_dir}/${build.release}/web/images"/>
         </phingcall>
         <phingcall target="deploy:symlink">
-            <property name="source" value="../../../${deploy.shared_dir}/public/media"/>
-            <property name="destination" value="${deploy.releases_dir}/${build.release}/public/media"/>
+            <property name="source" value="../../../${deploy.shared_dir}/web/media"/>
+            <property name="destination" value="${deploy.releases_dir}/${build.release}/web/media"/>
         </phingcall>
     </target>
 
@@ -359,8 +361,8 @@
             <equals arg1="${isDockerApplicable}" arg2="true"/>
             <then>
                 <echo>Initiating docker...</echo>
-                <exec command="scp -P${deploy.port} ./docker-compose.yml ${deploy.user}@${deploy.host}:${deploy.path}/docker-compose.yml" passthru="true" checkreturn="true"/>
-                <exec command="scp -P${deploy.port} -r ./.docker ${deploy.user}@${deploy.host}:${deploy.path}" passthru="true" checkreturn="true"/>
+                <exec command="scp -oStrictHostKeyChecking=no -P${deploy.port} ./docker-compose.yml ${deploy.user}@${deploy.host}:${deploy.path}/docker-compose.yml" passthru="true" checkreturn="true"/>
+                <exec command="scp -oStrictHostKeyChecking=no -P${deploy.port} -r ./.docker ${deploy.user}@${deploy.host}:${deploy.path}" passthru="true" checkreturn="true"/>
                 <phingcall target="deploy:command">
                     <property name="command" value="docker login -u ${env.DOCKER_USERNAME} -p ${env.DOCKER_PASSWORD} ${env.DOCKER_REGISTRY}"/>
                 </phingcall>
@@ -414,7 +416,7 @@
     <target name="deploy:command" hidden="true">
         <echo>Executing command '${command}' in ${deploy.path}</echo>
         <exec
-                command="ssh -p ${deploy.port} ${deploy.user}@${deploy.host} &quot;cd ${deploy.path} &amp;&amp; ${command}&quot;"
+                command="ssh -oStrictHostKeyChecking=no -p ${deploy.port} ${deploy.user}@${deploy.host} &quot;cd ${deploy.path} &amp;&amp; ${command}&quot;"
                 passthru="true"
                 checkreturn="true"
         />
@@ -430,7 +432,7 @@
             </then>
         </if>
         <exec
-                command="ssh -p ${deploy.port} ${deploy.user}@${deploy.host} &quot;docker container exec ${dockerUserParameterString}${deploy.reference}_web bash -c '${command}'&quot;"
+                command="ssh -oStrictHostKeyChecking=no -p ${deploy.port} ${deploy.user}@${deploy.host} &quot;docker container exec ${dockerUserParameterString}${deploy.reference}_web bash -c '${command}'&quot;"
                 passthru="true"
                 checkreturn="true"
         />
@@ -439,7 +441,7 @@
     <target name="deploy:symlink" hidden="true">
         <echo>Creating symlink '${source}' to '${destination}'</echo>
         <exec
-                command="ssh -p ${deploy.port} ${deploy.user}@${deploy.host} &quot;cd ${deploy.path} &amp;&amp; rm -Rf ${destination} &amp;&amp; ln -sf ${source} ${destination}&quot;"
+                command="ssh -oStrictHostKeyChecking=no -p ${deploy.port} ${deploy.user}@${deploy.host} &quot;cd ${deploy.path} &amp;&amp; rm -Rf ${destination} &amp;&amp; ln -sf ${source} ${destination}&quot;"
                 passthru="true"
                 checkreturn="true"
         />
