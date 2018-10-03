@@ -20,3 +20,6 @@ parameters:
     mailer_password:      ##MAILER_PASSWORD##
     mailer_from_address:  ##MAILER_FROM_ADDRESS##
     mailer_from_name:     ##MAILER_FROM_NAME##
+
+    tmp_storage_dir:      '##TMP_STORAGE_DIR##'
+    upload_tmp_dir:       '##UPLOAD_TMP_DIR##'

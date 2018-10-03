@@ -299,10 +299,6 @@
             <property name="destination" value="${deploy.releases_dir}/${build.release}/app/uploads"/>
         </phingcall>
         <phingcall target="deploy:symlink">
-            <property name="source" value="../../../${deploy.shared_dir}/var/cache"/>
-            <property name="destination" value="${deploy.releases_dir}/${build.release}/var/cache"/>
-        </phingcall>
-        <phingcall target="deploy:symlink">
             <property name="source" value="../../../${deploy.shared_dir}/var/logs"/>
             <property name="destination" value="${deploy.releases_dir}/${build.release}/var/logs"/>
         </phingcall>
