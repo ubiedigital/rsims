@@ -103,8 +103,8 @@
         <phingcall target="build:parameters"/>
         <phingcall target="build:environment"/>
 
-        <echo msg="Running composer install..."/>
-        <exec command="wget https://getcomposer.org/composer.phar -P ${build.release_path}" passthru="true"/>
+        <echo msg="Installing dependencies..."/>
+        <exec command="cd ${build.release_path} &amp;&amp; npm install --production" passthru="true"/>
         <exec command="cd ${build.release_path} &amp;&amp; ${php.bin} ${composer.command}" passthru="true"/>
 
         <echo msg="Creating archive..."/>
@@ -199,6 +199,8 @@
                             <token key="MAILER_PASSWORD" value="${build.parameters.mailer_password}"/>
                             <token key="MAILER_FROM_ADDRESS" value="${build.parameters.mailer_from_address}"/>
                             <token key="MAILER_FROM_NAME" value="${build.parameters.mailer_from_name}"/>
+                            <token key="TMP_STORAGE_DIR" value="${build.parameters.tmp_storage_dir}"/>
+                            <token key="UPLOAD_TMP_DIR" value="${build.parameters.upload_tmp_dir}"/>
                         </replacetokens>
                     </filterchain>
                 </copy>
@@ -254,6 +256,7 @@
         <phingcall target="deploy:ssl"/>
         <phingcall target="deploy:docker"/>
         <phingcall target="deploy:release"/>
+        <phingcall target="deploy:cleanup"/>
     </target>
 
     <!---
@@ -410,6 +413,16 @@
             <property name="source" value="./${deploy.releases_dir}/${build.release}"/>
             <property name="destination" value="${deploy.docroot_dir}"/>
         </phingcall>
+    </target>
+
+    <!---
+        Cleanup builds & releases
+    -->
+    <target name="deploy:cleanup" hidden="true">
+        <phingcall target="deploy:command">
+            <property name="command" value="find ./releases/** -maxdepth 0 -type d -mtime +3 -exec rm -Rf '{}' \;"/>
+        </phingcall>
+        <exec command="find ./build/* -maxdepth 0 -mtime +3 -exec rm -Rf '{}' \;" passthru="true"/>
     </target>
 
     <!---
