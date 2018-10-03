@@ -24,8 +24,10 @@ vendor
 !/bin/console
 composer.phar
 composer.lock
-build.*.properties
-build.parameters.*.properties
+build.properties.*
+!build.properties.dist
+build.parameters.properties.*
+!build.parameters.properties.dist
 
 var/cache/*
 var/logs/*

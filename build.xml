@@ -27,11 +27,11 @@
         Here we process all variables, based on environment and properties file variables
     -->
     <target name="variables">
-        <available file="build.${environment}.properties" property="build.properties.exists"/>
+        <available file="build.properties.${environment}" property="build.properties.exists"/>
         <if>
             <equals arg1="${build.properties.exists}" arg2="true"/>
             <then>
-                <property file="build.${environment}.properties" override="true"/>
+                <property file="build.properties.${environment}" override="true"/>
             </then>
         </if>
         <if>
@@ -173,12 +173,12 @@
         Builds parameters.yml file if build.parameters.properties exists otherwise composer will build it
     -->
     <target name="build:parameters">
-        <available file="build.parameters.${environment}.properties" property="build.parameters.properties.exists"/>
+        <available file="build.parameters.properties.${environment}" property="build.parameters.properties.exists"/>
         <if>
             <equals arg1="${build.parameters.properties.exists}" arg2="true"/>
             <then>
                 <echo msg="Building parameters file..."/>
-                <property file="build.parameters.${environment}.properties" override="true"/>
+                <property file="build.parameters.properties.${environment}" override="true"/>
                 <copy file="${build.release_path}/app/config/parameters.yml.dist"
                       tofile="${build.release_path}/app/config/parameters.yml" overwrite="true">
                     <filterchain>
